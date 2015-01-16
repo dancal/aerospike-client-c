@@ -105,6 +105,7 @@ as_bin * as_bin_init_int64(as_bin * bin, const as_bin_name name, int64_t value);
  *	@return The initialized `as_bin` on success. Otherwise NULL.
  */
 as_bin * as_bin_init_str(as_bin * bin, const as_bin_name name, const char * value, bool free);
+as_bin * as_bin_init_str2(as_bin * bin, const as_bin_name name, const char * value, uint32_t size, bool free);
 
 /**
  *	Initialize a stack allocated `as_key` to a raw bytes value.

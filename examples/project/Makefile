@@ -2,7 +2,7 @@
 ##  SETTINGS                                                                 ##
 ###############################################################################
 
-AS_HOST := 127.0.0.1
+AS_HOST := 172.16.8.149
 AS_PORT := 3000
 AS_ARGS := -h $(AS_HOST) -p $(AS_PORT)
 
@@ -10,6 +10,7 @@ OS = $(shell uname)
 ARCH = $(shell uname -m)
 PLATFORM = $(OS)-$(ARCH)
 
+AEROSPIKE=/root/jobs/aerospike-client-php/src/aerospike-client-c/
 CFLAGS = -std=gnu99 -g -Wall -fPIC
 CFLAGS += -fno-common -fno-strict-aliasing
 CFLAGS += -march=nocona -DMARCH_$(ARCH)

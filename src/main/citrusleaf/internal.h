@@ -128,7 +128,7 @@ uint8_t * cl_write_header(uint8_t *buf, size_t msg_sz, uint info1, uint info2, u
 
 int cl_value_to_op(cl_bin *v, cl_operator clOperator, cl_operation *operation, cl_msg_op *op);
 
-void cl_set_value_particular(cl_msg_op *op, cl_bin *value);
+void cl_set_value_particular(cl_msg_op *op, cl_bin *value );
 
 int cl_object_get_size(cl_object *obj, size_t *sz);
 

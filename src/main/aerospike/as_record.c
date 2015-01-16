@@ -258,6 +258,13 @@ bool as_record_set_strp(as_record * rec, const as_bin_name name, const char * va
 	return true;
 }
 
+bool as_record_set_strp2(as_record * rec, const as_bin_name name, const char * value, uint32_t size, bool free) 
+{
+	as_bin * bin = as_record_bin_forupdate(rec, name);
+	if ( !bin ) return false;
+	as_bin_init_str2(bin, name, value, size, free);
+	return true;
+}
 /**
  *	Set specified bin's value to raw bytes of given length.
  *	uint8_t bytes[3] = {1,2,3}
@@ -273,6 +280,7 @@ bool as_record_set_rawp(as_record * rec, const as_bin_name name, const uint8_t *
 	as_bin * bin = as_record_bin_forupdate(rec, name);
 	if ( !bin ) return false;
 	as_bin_init_raw(bin, name, value, size, free);
+
 	return true;
 }
 

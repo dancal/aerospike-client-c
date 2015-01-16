@@ -352,6 +352,8 @@ bool as_record_set_int64(as_record * rec, const as_bin_name name, int64_t value)
  */
 bool as_record_set_strp(as_record * rec, const as_bin_name name, const char * value, bool free);
 
+bool as_record_set_strp2(as_record * rec, const as_bin_name name, const char * value, uint32_t size, bool free);
+
 /**
  *	Set specified bin's value to an NULL terminated string.
  *

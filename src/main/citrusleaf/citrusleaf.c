@@ -261,51 +261,50 @@ dump_buf(char *info, uint8_t *buf, size_t buf_len)
 // forward ref
 static int value_to_op_int(int64_t value, uint8_t *data);
 
-// static void
-// dump_values(cl_bin *bins, cl_operation *operations, int n_bins)
-// {
-// 	if (as_log_debug_enabled()) {
-// 		as_log_debug(" n bins: %d", n_bins);
-// 		for (int i=0;i<n_bins;i++) {
-// 			cl_object *object = (bins ? &bins[i].object : &operations[i].bin.object);
-// 			char *name        = (bins ? bins[i].bin_name : operations[i].bin.bin_name);
-// 			as_log_debug("%d %s:  (sz %zd)",i, name,object->sz);
-// 			switch (object->type) {
-// 				case CL_NULL:
-// 					as_log_debug("NULL ");
-// 					break;
-// 				case CL_INT:
-// 					as_log_debug("int   %"PRIu64,object->u.i64);
-// 					break;
-// 				case CL_STR:
-// 					as_log_debug("str   %s",object->u.str);
-// 					break;
-// 				default:
-// 					as_log_debug("unk type %d",object->type);
-// 					break;
-// 			}
-// 		}
-// 	}
-// }
+static void
+dump_values(cl_bin *bins, cl_operation *operations, int n_bins)
+{
+		printf("\nn bins: %d", n_bins);
+		for (int i=0;i<n_bins;i++) {
+			cl_object *object = (bins ? &bins[i].object : &operations[i].bin.object);
+			char *name        = (bins ? bins[i].bin_name : operations[i].bin.bin_name);
+			printf("\n%d %s:  (sz %zd)",i, name,object->sz);
+			switch (object->type) {
+				case CL_NULL:
+					printf("NULL ");
+					break;
+				case CL_INT:
+					printf("int   %"PRIu64,object->u.i64);
+					break;
+				case CL_STR:
+					printf("str   %d, %s,",strlen(object->u.str), object->u.str);
+					break;
+				default:
+					printf("unk type %d",object->type);
+					break;
+			}
+			printf("\n\n");
+		}
+}
 
-// static void
-// dump_key(char *msg, cl_object const *key)
-// {
-// 	switch (key->type) {
-// 		case CL_NULL:
-// 			as_log_debug("%s: key NULL ",msg);
-// 			break;
-// 		case CL_INT:
-// 			as_log_debug("%s: key int   %"PRIu64,msg,key->u.i64);
-// 			break;
-// 		case CL_STR:
-// 			as_log_debug("%s: key str   %s",msg,key->u.str);
-// 			break;
-// 		default:
-// 			as_log_debug("%s: key unk type %d",msg,key->type);
-// 			break;
-// 	}
-// }
+static void
+dump_key(char *msg, cl_object const *key)
+{
+	switch (key->type) {
+		case CL_NULL:
+			as_log_debug("%s: key NULL ",msg);
+			break;
+		case CL_INT:
+			as_log_debug("%s: key int   %"PRIu64,msg,key->u.i64);
+			break;
+		case CL_STR:
+			as_log_debug("%s: key str   %s",msg,key->u.str);
+			break;
+		default:
+			as_log_debug("%s: key unk type %d",msg,key->type);
+			break;
+	}
+}
 
 
 //
@@ -826,6 +825,7 @@ cl_compile(uint info1, uint info2, uint info3, const char *ns, const char *set, 
 
 	// determine the size
 	size_t	msg_sz = sizeof(as_msg); // header
+
 	// fields
 	if (ns)     msg_sz += sizeof(cl_msg_field) + ns_len;
 	if (set)    msg_sz += sizeof(cl_msg_field) + set_len;
@@ -1062,12 +1062,12 @@ set_object(cl_msg_op *op, cl_object *obj)
 			memcpy(obj->u.str, cl_msg_op_get_value_p(op), obj->sz);
 			obj->u.str[obj->sz] = 0;
 			break;
+		case CL_PHP_BLOB:
 		case CL_BLOB:
 		case CL_JAVA_BLOB:
 		case CL_CSHARP_BLOB:
 		case CL_PYTHON_BLOB:
 		case CL_RUBY_BLOB:
-		case CL_PHP_BLOB:
 		case CL_LUA_BLOB:
 		case CL_MAP:
 		case CL_LIST:
@@ -1118,9 +1118,11 @@ cl_set_value_particular(cl_msg_op *op, cl_bin *value)
 		return;
 	}
 
+	memset(value->bin_name, 0x00, sizeof(value->bin_name));
 	memcpy(value->bin_name, op->name, op->name_sz);
 	value->bin_name[op->name_sz] = 0;
 	set_object(op, &value->object);
+
 }
 
 
@@ -1172,8 +1174,27 @@ cl_parse(cl_msg *msg, uint8_t *buf, size_t buf_len, cl_bin **values_r,
 		buf = (uint8_t *) mf;
 	}
 
+/*
+typedef struct cl_msg_op_s {
+    uint32_t op_sz;
+    uint8_t  op;
+    uint8_t  particle_type;
+    uint8_t  version;
+    uint8_t  name_sz;
+    uint8_t  name[]; // UTF-8
+    // there's also a value here but you can't have two variable size arrays
+} cl_msg_op;
+*/
 	cl_msg_op *op = (cl_msg_op *)buf;
-	
+
+//for (int i = 0; i != buf_len; ++i) {
+//	printf("C after decrypt %d = %c = %02x\n",i,buf[i],buf[i]);
+//	if ( i == 245 || i == 951 || i == 997 || i == 1035 || i == 1166 || i == 1630 || i == 1869 || i == 1871 ) {
+//		buf[i] = 0x14;
+//	}
+//}
+
+
 	// If we weren't passed in a buffer to complete, we allocate one.
 
 	// If we need *more* bins than the caller has allocated to us, we allocate a
@@ -1202,6 +1223,7 @@ cl_parse(cl_msg *msg, uint8_t *buf, size_t buf_len, cl_bin **values_r,
 				cl_msg_swap_op_from_be(op);
 				cl_set_value_particular(op, value);
 				op = cl_msg_op_get_next(op);
+
 			}
 		}
 		else {
@@ -1262,7 +1284,6 @@ do_the_full_monte(as_cluster *asc, int info1, int info2, int info3, const char *
 	int fd = -1;
 
 //	if( *values ){
-//		dump_values(*values, null, *n_values);
 //	}else if( *operations ){
 //		dump_values(null, *operations, *n_values);
 //	}
@@ -1411,7 +1432,7 @@ do_the_full_monte(as_cluster *asc, int info1, int info2, int info3, const char *
 
 		// second read for the remainder of the message - expect this to cover everything requested
 		// if there's no error
-		rd_buf_sz =  msg.proto.sz  - msg.m.header_sz;
+		rd_buf_sz =  msg.proto.sz - msg.m.header_sz;
 		if (rd_buf_sz > 0) {
 			if (rd_buf_sz > sizeof(rd_stack_buf)) {
 				rd_buf = malloc(rd_buf_sz);
@@ -1425,6 +1446,7 @@ do_the_full_monte(as_cluster *asc, int info1, int info2, int info3, const char *
         before_read_body_time = cf_getms();
 #endif            
 			rv = cf_socket_read_timeout(fd, rd_buf, rd_buf_sz, deadline_ms, progress_timeout_ms);
+
 #ifdef DEBUG_TIME
         after_read_body_time = cf_getms();
 #endif
@@ -1510,11 +1532,13 @@ Ok:
 				rv = 0;
 			}
 		}
+
+		//dump_values(*values, NULL, *n_values);
     }
     else {
         rv = AEROSPIKE_ERR_SERVER;
     }    
-	if (rd_buf && (rd_buf != rd_stack_buf))		free(rd_buf);
+//	if (rd_buf && (rd_buf != rd_stack_buf))		free(rd_buf);
 	
 	// if (rv == 0 && (values || operations) && n_values) {
 	// 	for (int i=0;i<*n_values;i++) {

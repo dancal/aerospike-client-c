@@ -111,6 +111,12 @@ as_bin * as_bin_init_str(as_bin * bin, const as_bin_name name, const char * valu
 	return as_bin_defaults(bin, name, &bin->value);
 }
 
+as_bin * as_bin_init_str2(as_bin * bin, const as_bin_name name, const char * value, uint32_t size, bool free)
+{
+	if ( !bin ) return bin;
+	as_string_init2((as_string *) &bin->value, (char *) value, size, free);
+	return as_bin_defaults(bin, name, &bin->value);
+}
 /**
  *	Initialize a stack allocated `as_key` to a raw bytes value.
  *

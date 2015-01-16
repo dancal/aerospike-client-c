@@ -208,7 +208,7 @@ typedef struct cl_proto_s {
 typedef struct cl_comp_proto_s {
 	cl_proto  	proto;     // Protocol header
 	uint64_t 	org_sz;    // Original size of compressed data hold in 'data'
-	uint8_t data[];        // Compressed data
+	uint8_t 	data[];        // Compressed data
 }  cl_comp_proto;
 
  /* cl_msg_field

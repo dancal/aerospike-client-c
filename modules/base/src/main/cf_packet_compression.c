@@ -85,6 +85,7 @@ cf_compress(int argc, uint8_t *argv[])
 int
 cf_packet_compression(uint8_t *buf, size_t buf_sz, uint8_t **compressed_packet, size_t *compressed_packet_sz)
 {
+	int ret_value = 0;
 	uint8_t *tmp_buf;
 	uint8_t wr_stack_buf[STACK_BUF_SZ];
 	uint8_t *wr_buf = wr_stack_buf;

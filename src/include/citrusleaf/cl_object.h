@@ -24,11 +24,11 @@
 
 
 typedef enum cl_type_e { 
-    CL_NULL         = 0,
-    CL_INT          = 1,
+    CL_NULL         = 0x00,
+    CL_INT          = 0x1,
     CL_FLOAT        = 2,
-    CL_STR          = 3,
-    CL_BLOB         = 4,
+    CL_STR          = 0x03,
+    CL_BLOB         = 0x04,
     CL_TIMESTAMP    = 5,
     CL_DIGEST       = 6,
     CL_JAVA_BLOB    = 7,

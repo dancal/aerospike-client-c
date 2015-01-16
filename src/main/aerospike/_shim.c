@@ -208,6 +208,7 @@ void askey_from_clkey(as_key * key, const as_namespace ns, const as_set set, cl_
 			as_key_init_int64(key, ns, set, clkey->u.i64);
 			break;
 		case CL_STR: {
+printf("safasfsa");
 			// Must null-terminate here.
 			char* s = (char*)malloc(clkey->sz + 1);
 			memcpy(s, clkey->u.str, clkey->sz);
@@ -299,7 +300,7 @@ void clbin_to_asrecord(cl_bin * bin, as_record * r)
 			break;
 		}
 		case CL_STR: {
-			as_record_set_strp(r, bin->bin_name, bin->object.u.str, true);
+			as_record_set_strp2(r, bin->bin_name, bin->object.u.str, (uint32_t)bin->object.sz, true);
 			// the following completes the handoff of the value.
 			bin->object.free = NULL;
 			break;
