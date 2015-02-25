@@ -208,7 +208,6 @@ void askey_from_clkey(as_key * key, const as_namespace ns, const as_set set, cl_
 			as_key_init_int64(key, ns, set, clkey->u.i64);
 			break;
 		case CL_STR: {
-printf("safasfsa");
 			// Must null-terminate here.
 			char* s = (char*)malloc(clkey->sz + 1);
 			memcpy(s, clkey->u.str, clkey->sz);
